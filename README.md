@@ -5,6 +5,7 @@ Simple CLI tool for using the SideFX Web API.
 
 ```bash
 pip install sidefx-web
+sidefx-web --setup
 ```
 
 ## Example Usages
