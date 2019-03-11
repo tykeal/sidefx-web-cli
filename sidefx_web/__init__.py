@@ -53,7 +53,8 @@ def cli():
                         help='Enable DEBUG output.')
     parser.add_argument('--setup', '-s', action='store_true',
                         help='Setup configuration for SideFX Web API.')
-    subparsers = parser.add_subparsers()
+    subparsers = parser.add_subparsers(dest='cmd')
+    subparsers.required = True
 
     download_parser = subparsers.add_parser(
         'download', help='Download a SideFX product.')
