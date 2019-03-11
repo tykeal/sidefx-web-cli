@@ -107,7 +107,7 @@ def cli():
 
     log.debug('Access Token URL: {}'.format(args.access_token_url))
     log.debug('Client ID: {}'.format(client_id))
-    log.debug('Client Secret Key: {}'.format(client_secret_key))
+    log.debug('Client Secret Key: ******{}'.format(client_secret_key[-6:]))
     log.debug('Cached Access Token: {}'.format(token))
     log.debug('Cached Access Token Expiry: {}'.format(token_expiry))
 
