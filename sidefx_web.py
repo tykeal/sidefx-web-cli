@@ -62,13 +62,30 @@ def cli():
     cfg = get_config()
     client_id = cfg.get('Auth', 'client_id')
     client_secret_key = cfg.get('Auth', 'client_secret_key')
+    token = cfg.get('Cache', 'access_token', fallback=None)
+    token_expiry = cfg.get('Cache', 'access_token_expiry', fallback=None)
+    if token_expiry:
+        token_expiry = float(token_expiry)
+
     log.debug('Access Token URL: {}'.format(args.access_token_url))
     log.debug('Client ID: {}'.format(client_id))
     log.debug('Client Secret Key: {}'.format(client_secret_key))
-    token, expiry = get_access_token(
-        args.access_token_url, client_id, client_secret_key)
+    log.debug('Cached Access Token: {}'.format(token))
+    log.debug('Cached Access Token Expiry: {}'.format(token_expiry))
+
+    if (token is None or token_expiry is None or token_expiry < time.time()):
+        log.info('Fetching a new token.')
+        token, token_expiry = get_access_token(
+            args.access_token_url, client_id, client_secret_key)
+
+        if not cfg.has_section('Cache'):
+            cfg.add_section('Cache')
+        cfg.set('Cache', 'access_token', token)
+        cfg.set('Cache', 'access_token_expiry', str(token_expiry))
+        save_config(cfg)
+
     log.debug('Access Token: {}'.format(token))
-    log.debug('Expiry Time: {}'.format(expiry))
+    log.debug('Access Token Expiry Time: {}'.format(token_expiry))
 
 
 def get_access_token(url, client_id, client_secret_key):
@@ -100,6 +117,13 @@ def get_config():
     return cfg
 
 
+def save_config(cfg):
+    cfgfile = pathlib.Path(CONFIG_FILE)
+    with open(CONFIG_FILE, 'w') as f:
+        cfg.write(f)
+        log.debug('Saved config file.')
+
+
 def setup():
     log.info('Credentials are needed in order to use the SideFX Web API. '
              'Detailed instructions available at '
@@ -117,11 +141,7 @@ def setup():
 
     cfgdir = pathlib.Path(CONFIG_DIR)
     cfgdir.mkdir(parents=True, exist_ok=True)
-
-    cfgfile = pathlib.Path(CONFIG_FILE)
-    with open(CONFIG_FILE, 'w') as f:
-        cfg.write(f)
-        log.debug('Saved config file.')
+    save_config(cfg)
 
 
 class LogFormatter(logging.Formatter):
