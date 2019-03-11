@@ -32,6 +32,7 @@ import logging
 import pathlib
 import sys
 import time
+import urllib
 
 import requests
 
@@ -53,6 +54,23 @@ def cli():
     parser.add_argument('--setup', '-s', action='store_true',
                         help='Setup configuration for SideFX Web API.')
     subparsers = parser.add_subparsers()
+
+    download_parser = subparsers.add_parser(
+        'download', help='Download a SideFX product.')
+    download_parser.add_argument(
+        'product', type=str, choices=['houdini', 'houdini-qt4'],
+        help='Product to list: houdini, houdini-qt4')
+    download_parser.add_argument(
+        'version', type=str,
+        help='The major version of Houdini. e.g. 16.5, 17.0.')
+    download_parser.add_argument(
+        'build', type=str,
+        help=('Either a specific build number, e.g. 382, or the string '
+              '"production" to get the latest production build'))
+    download_parser.add_argument(
+        'platform', type=str, choices=['win64', 'macos', 'linux'],
+        help='The operating system to install Houdini on: win64, macos, linux')
+    download_parser.set_defaults(func='download')
 
     list_builds_parser = subparsers.add_parser(
         'list-builds', help='List SideFX products available for download.')
@@ -111,6 +129,23 @@ def cli():
                     version=args.version,
                     platform=args.platform,
                     only_production=args.only_production)
+    elif args.func == 'download':
+        download(args.endpoint_url, token,
+                 args.product, args.version, args.build, args.platform)
+
+
+def download(endpoint_url, token,
+             product,
+             version,
+             build,
+             platform):
+    resp = call_api(endpoint_url, token, 'download.get_daily_build_download',
+                    product, version, build, platform)
+    log.debug(resp)
+    download_url = resp.get('download_url')
+    filename = resp.get('filename')
+    log.info('Downloading {}'.format(filename))
+    urllib.request.urlretrieve(download_url, filename)
 
 
 def list_builds(endpoint_url, token, product,
