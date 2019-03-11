@@ -27,6 +27,7 @@
 import argparse
 import base64
 import configparser
+import json
 import logging
 import pathlib
 import sys
@@ -51,6 +52,24 @@ def cli():
                         help='Enable DEBUG output.')
     parser.add_argument('--setup', '-s', action='store_true',
                         help='Setup configuration for SideFX Web API.')
+    subparsers = parser.add_subparsers()
+
+    list_builds_parser = subparsers.add_parser(
+        'list-builds', help='List SideFX products available for download.')
+    list_builds_parser.add_argument(
+        'product', type=str, choices=['houdini', 'houdini-qt4'],
+        help='Product to list: houdini, houdini-qt4')
+    list_builds_parser.add_argument(
+        '--version', type=str,
+        help='The major version of Houdini. e.g. 16.5, 17.0.')
+    list_builds_parser.add_argument(
+        '--platform', type=str, choices=['win64', 'macos', 'linux'],
+        help='The operating system to install Houdini on: win64, macos, linux')
+    list_builds_parser.add_argument(
+        '--only-production', action='store_true',
+        help='Only return the production builds.')
+    list_builds_parser.set_defaults(func='list_builds')
+
     args = parser.parse_args()
 
     if args.debug:
@@ -87,6 +106,41 @@ def cli():
     log.debug('Access Token: {}'.format(token))
     log.debug('Access Token Expiry Time: {}'.format(token_expiry))
 
+    if args.func == 'list_builds':
+        list_builds(args.endpoint_url, token, args.product,
+                    version=args.version,
+                    platform=args.platform,
+                    only_production=args.only_production)
+
+
+def list_builds(endpoint_url, token, product,
+                version=None,
+                platform=None,
+                only_production=None):
+    resp = call_api(endpoint_url, token, 'download.get_daily_builds_list',
+                    product, version, platform, only_production)
+    for i in resp:
+        log.info(i)
+
+
+############
+# Requests #
+############
+
+def call_api(endpoint_url, access_token, function_name, *args, **kwargs):
+    """Call into the Web API."""
+    response = requests.post(
+        endpoint_url,
+        headers={
+            "Authorization": "Bearer " + access_token,
+        },
+        data=dict(
+            json=json.dumps([function_name, args, kwargs]),
+        ))
+    if response.status_code == 200:
+        return response.json()
+    log.debug(response.status_code, response.reason, response.text)
+
 
 def get_access_token(url, client_id, client_secret_key):
     auth = base64.b64encode("{}:{}".format(
@@ -105,6 +159,10 @@ def get_access_token(url, client_id, client_secret_key):
     expiry_time = time.time() - 2 + data['expires_in']
     return data['access_token'], expiry_time
 
+
+#################
+# Configuration #
+#################
 
 def get_config():
     cfg = configparser.ConfigParser()
