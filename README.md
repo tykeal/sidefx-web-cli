@@ -1,6 +1,12 @@
 # sidefx-web
 Simple CLI tool for using the SideFX Web API.
 
+## Install
+
+```bash
+pip install sidefx-web
+```
+
 ## Example Usages
 
 ### List houdini versions
@@ -18,4 +24,3 @@ sidefx-web list-builds houdini --platform linux       # Filter platform: linux, 
 sidefx-web download -h                      # Print help message
 sidefx-web download houdini 16.5 496 linux  # Download houdini 16.5 build 496 for linux
 ```
-
