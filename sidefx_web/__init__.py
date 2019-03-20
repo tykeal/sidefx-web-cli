@@ -55,7 +55,6 @@ def cli():
     parser.add_argument('--setup', '-s', action='store_true',
                         help='Setup configuration for SideFX Web API.')
     subparsers = parser.add_subparsers(dest='cmd')
-    subparsers.required = True
 
     download_parser = subparsers.add_parser(
         'download', help='Download a SideFX product.')
@@ -126,14 +125,15 @@ def cli():
     log.debug('Access Token: {}'.format(token))
     log.debug('Access Token Expiry Time: {}'.format(token_expiry))
 
-    if args.func == 'list_builds':
-        list_builds(args.endpoint_url, token, args.product,
-                    version=args.version,
-                    platform=args.platform,
-                    only_production=args.only_production)
-    elif args.func == 'download':
-        download(args.endpoint_url, token,
-                 args.product, args.version, args.build, args.platform)
+    if hasattr(args, 'func'):
+        if args.func == 'list_builds':
+            list_builds(args.endpoint_url, token, args.product,
+                        version=args.version,
+                        platform=args.platform,
+                        only_production=args.only_production)
+        elif args.func == 'download':
+            download(args.endpoint_url, token,
+                     args.product, args.version, args.build, args.platform)
 
 
 def download(endpoint_url, token,
