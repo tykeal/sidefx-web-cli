@@ -1,6 +1,10 @@
 # sidefx-web
 Simple CLI tool for using the SideFX Web API.
 
+## Requirements
+
+* Python 3
+
 ## Install
 
 ```bash
