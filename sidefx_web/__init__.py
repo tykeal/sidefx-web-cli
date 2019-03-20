@@ -29,6 +29,7 @@ import base64
 import configparser
 import json
 import logging
+import os
 import pathlib
 import sys
 import time
@@ -215,6 +216,7 @@ def save_config(cfg):
     cfgfile = pathlib.Path(CONFIG_FILE)
     with open(CONFIG_FILE, 'w') as f:
         cfg.write(f)
+        os.chmod(CONFIG_FILE, 0o600)
         log.debug('Saved config file.')
 
 
