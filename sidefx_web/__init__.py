@@ -81,7 +81,7 @@ def cli():
         help=('Either a specific build number, e.g. 382, or the string '
               '"production" to get the latest production build'))
     download_parser.add_argument(
-        'platform', type=str, choices=['win64', 'macos', 'linux'],
+        'platform', type=str, choices=['win64', 'macos', 'linux', ''],
         help='The operating system to install Houdini on: win64, macos, linux')
     download_parser.set_defaults(func='download')
 
@@ -94,7 +94,7 @@ def cli():
         '--version', type=str,
         help='The major version of Houdini. e.g. 16.5, 17.0.')
     list_builds_parser.add_argument(
-        '--platform', type=str, choices=['win64', 'macos', 'linux'],
+        '--platform', type=str, choices=['win64', 'macos', 'linux', ''],
         help='The operating system to install Houdini on: win64, macos, linux')
     list_builds_parser.add_argument(
         '--only-production', action='store_true',
