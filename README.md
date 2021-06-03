@@ -19,7 +19,7 @@ sidefx-web --setup
 ```bash
 sidefx-web list-builds -h                             # Print help message
 sidefx-web list-builds houdini
-sidefx-web list-builds houdini-qt4 --only-production  # Filter only production builds
+sidefx-web list-builds houdini-py3 --only-production  # Filter only production builds
 sidefx-web list-builds houdini --version 16.5         # Filter version e.g. 16.5, 17.0
 sidefx-web list-builds houdini --platform linux       # Filter platform: linux, macos, win64
 ```
