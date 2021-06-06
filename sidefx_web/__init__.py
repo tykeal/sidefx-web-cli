@@ -40,6 +40,18 @@ import requests
 CONFIG_DIR = '/'.join([str(pathlib.Path.home()), '.config', 'sidefx-web'])
 CONFIG_FILE = '/'.join([CONFIG_DIR, 'config.ini'])
 
+PRODUCT_CHOICES = [
+    'houdini',
+    'houdini-py3',
+    'sidefxlabs',
+    'docker',
+    'sidefxlabs',
+    'houdini-launcher',
+    'houdini-launcher-py3',
+    'launcher-iso',
+    'launcher-iso-py3'
+]
+
 
 def cli():
     parser = argparse.ArgumentParser()
@@ -59,8 +71,8 @@ def cli():
     download_parser = subparsers.add_parser(
         'download', help='Download a SideFX product.')
     download_parser.add_argument(
-        'product', type=str, choices=['houdini', 'houdini-qt4'],
-        help='Product to list: houdini, houdini-qt4')
+        'product', type=str, choices=PRODUCT_CHOICES,
+        help='Product to list: {}'.format(", ".join(PRODUCT_CHOICES)))
     download_parser.add_argument(
         'version', type=str,
         help='The major version of Houdini. e.g. 16.5, 17.0.')
@@ -69,20 +81,20 @@ def cli():
         help=('Either a specific build number, e.g. 382, or the string '
               '"production" to get the latest production build'))
     download_parser.add_argument(
-        'platform', type=str, choices=['win64', 'macos', 'linux'],
+        'platform', type=str, choices=['win64', 'macos', 'linux', ''],
         help='The operating system to install Houdini on: win64, macos, linux')
     download_parser.set_defaults(func='download')
 
     list_builds_parser = subparsers.add_parser(
         'list-builds', help='List SideFX products available for download.')
     list_builds_parser.add_argument(
-        'product', type=str, choices=['houdini', 'houdini-qt4'],
-        help='Product to list: houdini, houdini-qt4')
+        'product', type=str, choices=PRODUCT_CHOICES,
+        help='Product to list: {}'.format(", ".join(PRODUCT_CHOICES)))
     list_builds_parser.add_argument(
         '--version', type=str,
         help='The major version of Houdini. e.g. 16.5, 17.0.')
     list_builds_parser.add_argument(
-        '--platform', type=str, choices=['win64', 'macos', 'linux'],
+        '--platform', type=str, choices=['win64', 'macos', 'linux', ''],
         help='The operating system to install Houdini on: win64, macos, linux')
     list_builds_parser.add_argument(
         '--only-production', action='store_true',
